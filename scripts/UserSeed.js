@@ -18,7 +18,7 @@ let users = [
     username: "User1",
     email: "user1@gmail.com",
     password: "User1234",
-    partyId: 1,
+    partyId: ObjectId("6037246741a40939fbfcb93d"),
     topCategories: {
       1: "drama",
       2: "comedy",
@@ -125,7 +125,7 @@ let users = [
     username: "User2",
     email: "user2@gmail.com",
     password: "User1234",
-    partyId: 1,
+    partyId: ObjectId("6037246741a40939fbfcb93d"),
     topCategories: {
       1: "mystery",
       2: "suspense",
@@ -188,7 +188,7 @@ let users = [
     username: "User3",
     email: "user3@gmail.com",
     password: "User1234",
-    partyId: 1,
+    partyId: ObjectId("6037246741a40939fbfcb93d"),
     topCategories: {
       1: "sports",
       2: "documentary",

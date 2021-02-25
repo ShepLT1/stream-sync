@@ -8,10 +8,14 @@ const PartySchema = new Schema({
   },
 
   members: {
-    type: Array
+    type: Array,
+    of: Schema.Types.ObjectId,
+    ref: "User"
   },
 
-  recentlyWatched: Schema.Types.Mixed
+  watched: {
+    type: Array
+  }
 
 });
 
