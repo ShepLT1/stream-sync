@@ -11,11 +11,7 @@ const UserSchema = new Schema({
   email: {
     type: String,
     required: "Email required",
-    unique: true,
-    validate: {
-      validator: validator.isEmail,
-      message: "Invalid email",
-    },
+    unique: true
   },
 
   password: {
@@ -30,7 +26,10 @@ const UserSchema = new Schema({
 
   topCategories: Schema.Types.Mixed,
 
-  viewedPartyLikes: Schema.Types.Mixed,
+  viewedPartyLikes: {
+    type: Map,
+    of: String
+  },
 
   // have a key "matched" that contains IDs of party members that also like movie
   likedMovies: Schema.Types.Mixed,
@@ -41,7 +40,9 @@ const UserSchema = new Schema({
 
   showQueue: Schema.Types.Mixed,
 
-  watchedTitles: Schema.Types.Mixed
+  watchedTitles: {
+    type: Array
+  }
 
 });
 
