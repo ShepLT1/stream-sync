@@ -10,6 +10,7 @@ module.exports = {
 
   getUsernamesEmails: function (req, res) {
     db.User.find()
+      // send only emails/usernames to front end
       .then((dbModel) => res.json(dbModel))
       .catch((err) => res.status(422).json(err));
   },
@@ -111,5 +112,38 @@ module.exports = {
       .save()
       .then((dbModel) => res.json(dbModel))
       .catch((err) => res.status(422).json(err));
-  }
+  },
+
+  getParty: function (req, res) {
+    db.Party.find({ _id: req.id })
+      .then((dbModel) => res.json(dbModel))
+      .catch((err) => res.status(422).json(err));
+  },
+
+  deleteParty: function (req, res) {
+    db.Party.findOneAndDelete({ _id: req.id })
+      .then((dbModel) => res.json(dbModel))
+      .catch((err) => res.status(422).json(err));
+  },
+
+  getPartyNames: function (req, res) {
+    db.Party.find()
+      // send only party names to front end
+      .then((dbModel) => res.json(dbModel))
+      .catch((err) => res.status(422).json(err));
+  },
+
+  createParty: function (req, res) {
+    db.Party.create(req)
+      .then((dbModel) => res.json(dbModel))
+      .catch((err) => res.status(422).json(err));
+  },
+
+  updatePartySettings: function (req, res) {
+    db.Party.find({ _id: req.id })
+      // switch statement to determine which settings to be updated
+      .save()
+      .then((dbModel) => res.json(dbModel))
+      .catch((err) => res.status(422).json(err));
+  },
 };
