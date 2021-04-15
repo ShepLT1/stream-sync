@@ -1,5 +1,5 @@
 {
-  "name": "stream-sync",
+  "name": "stream-sync-backend",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -23,6 +23,7 @@
     "axios": "^0.21.1",
     "express": "^4.17.1",
     "if-env": "^1.0.4",
-    "mongoose": "^5.11.18"
+    "mongoose": "^5.11.18",
+    "morgan": "^1.10.0"
   }
 }

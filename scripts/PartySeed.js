@@ -16,7 +16,7 @@ mongoose.connect(
 let parties = [
   {
     name: "Party1",
-    members: [ObjectId("60371e08744d5e3681a40f00"), ObjectId("60371e08744d5e3681a40f01"), ObjectId("60371e08744d5e3681a40f02")],
+    members: ["60371e08744d5e3681a40f00", "60371e08744d5e3681a40f01", "60371e08744d5e3681a40f02"],
     watched: [123480, 123481, 123482, 123483, 123484, 123485]
   }
 ];
