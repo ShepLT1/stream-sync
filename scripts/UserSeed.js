@@ -24,13 +24,13 @@ let users = [
       2: "comedy",
       3: "thriller"
     },
-    viewedPartyLikes: {
-      123456: "User2",
-      123457: "User3",
-      123458: "User2",
-      123459: "User2",
-      123577: "User3"
-    },
+    viewedPartyLikes: [
+      123456,
+      123457,
+      123458,
+      123459,
+      123577
+    ],
     likedMovies: {
       head: 123460,
       tail: 123463,
@@ -131,9 +131,9 @@ let users = [
       2: "suspense",
       3: "romantic"
     },
-    viewedPartyLikes: {
-      123460: "User1"
-    },
+    viewedPartyLikes: [
+      123460
+    ],
     likedMovies: {
       head: 123456,
       tail: 123459,
@@ -194,7 +194,7 @@ let users = [
       2: "documentary",
       3: "comedy"
     },
-    viewedPartyLikes: {},
+    viewedPartyLikes: [],
     likedMovies: {
       head: 123457,
       tail: 123457,
