@@ -27,8 +27,7 @@ const UserSchema = new Schema({
   topCategories: Schema.Types.Mixed,
 
   viewedPartyLikes: {
-    type: Map,
-    of: String
+    type: Array
   },
 
   // have a key "matched" that contains IDs of party members that also like movie

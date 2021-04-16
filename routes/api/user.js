@@ -41,9 +41,9 @@ router.delete("/watched", (req, res) => {
   controller.removeWatchedTitle(req, res);
 });
 
-router.put("/rating", (req, res) => {
-  controller.updateRating(req, res);
-});
+// router.put("/rating", (req, res) => {
+//   controller.updateRating(req, res);
+// });
 
 router.post("/viewed", (req, res) => {
   controller.viewedPartyTitle(req, res);

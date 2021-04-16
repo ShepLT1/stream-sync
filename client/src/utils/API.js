@@ -118,13 +118,13 @@ export default {
     })
   },
   // update a watched title's rating
-  updateRating: function (userData) {
-    return axios({
-      method: "put",
-      data: userData,
-      url: "/api/user/rating"
-    })
-  },
+  // updateRating: function (userData) {
+  //   return axios({
+  //     method: "put",
+  //     data: userData,
+  //     url: "/api/user/rating"
+  //   })
+  // },
   // log a party memeber's liked title as already viewed
   viewedPartyTitles: function (userData) {
     return axios({

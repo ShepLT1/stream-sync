@@ -1,11 +1,22 @@
 const db = require("../models");
 
-const movieShowSwitch = (type) => {
+const likedMovieShowSwitch = (type) => {
   switch (type) {
     case "movie":
       return "likedMovies"
     case "show":
       return "likedShows"
+    default:
+      return
+  }
+}
+
+const queueMovieShowSwitch = (type) => {
+  switch (type) {
+    case "movie":
+      return "movieQueue"
+    case "show":
+      return "showQueue"
     default:
       return
   }
@@ -64,19 +75,23 @@ module.exports = {
   // },
 
   likeTitle: function (req, res) {
-    let likedList = movieShowSwitch(req.body.type);
+    const likedList = likedMovieShowSwitch(req.body.titleType);
     db.User.find({ _id: req.body.id })
       .select([likedList])
       .then(async (data) => {
         let list = data[0][likedList]
-        let titleId = req.body.titleId
+        const titleId = req.body.titleId
         list[titleId] = {
           "title": req.body.titleName,
           "imdb": req.body.imdbRating,
           "next": null
         }
-        let tailId = list.tail
-        list[tailId].next = titleId
+        if (list.head === null) {
+          list.head = titleId
+        } else {
+          let tailId = list.tail
+          list[tailId].next = titleId
+        }
         list.tail = titleId
         // await data.save()
         res.json(data)
@@ -85,23 +100,28 @@ module.exports = {
   },
 
   unlikeTitle: function (req, res) {
-    let likedList = movieShowSwitch(req.body.type);
+    const likedList = likedMovieShowSwitch(req.body.titleType);
     db.User.find({ _id: req.body.id })
       .select([likedList])
       .then(async (data) => {
         let list = data[0][likedList]
-        let titleId = req.body.titleId
+        const titleId = req.body.titleId
+        let headId = list.head
         if (titleId === list.head) {
-          let headId = list.head
           list.head = list[headId].next
+        } else if (list[headId].next === titleId && list[headId].next === list.tail) {
+          list.tail = list.head
+          list[headId].next = null
         } else {
-          let current = list.head
-          while (current.next !== req.body.titleId) {
+          let current = list[headId]
+          let prev = null;
+          while (current.next !== titleId) {
+            prev = current
             current = list[current.next]
           }
           current.next = list[current.next].next
-          if (!current.next) {
-            list.tail = current.next
+          if (current.next === null) {
+            list.tail = prev.next
           }
         }
         list[titleId] = undefined;
@@ -116,13 +136,13 @@ module.exports = {
       .populate("partyId")
       // add watched title to user/party list
       .then(async (userData) => {
-        const title = req.body.titleId
+        const titleId = req.body.titleId
         db.Party.find({ _id: userData[0].partyId._id })
           .then(async (partyData) => {
-            partyData[0].watched.push(title)
+            partyData[0].watched.push(titleId)
             // await partyData.save()
           })
-        userData[0].watchedTitles.push(title)
+        userData[0].watchedTitles.push(titleId)
         // await userData.save()
         res.json(userData)
       })
@@ -134,86 +154,134 @@ module.exports = {
       .populate("partyId")
       // delete watched title from user/party list
       .then(async (userData) => {
-        const title = req.body.titleId
+        const titleId = req.body.titleId
         db.Party.find({ _id: userData[0].partyId._id })
           .then(async (partyData) => {
             let partyWatched = partyData[0].watched
             let i = partyWatched.length - 1
             let found = false;
             while (!found || i !== -1) {
-              if (title === partyWatched[i]) {
+              if (titleId === partyWatched[i]) {
                 found = true;
               } else {
                 i--
               }
             }
-            if (i === partyWatched.length - 1) {
-              partyWatched.pop()
-            } else if (i === 0) {
-              partyWatched.shift()
+            if (i > -1) {
+              partyData[0].watched = partWatched.splice(i, 1)
+              // await partyData.save()
             } else {
-              partyWatched = partyWatched.slice(0, i).concat(partyWatched.slice(i + 1))
+              res.send("Party title not found")
             }
-            partyData[0].watched = partyWatched
-            // await partyData.save()
           })
         let userWatched = userData[0].watched
         let j = userWatched.length - 1
         let found = false;
         while (!found || j !== -1) {
-          if (title === userWatched[j]) {
+          if (titleId === userWatched[j]) {
             found = true;
           } else {
             j--
           }
         }
-        if (j === userWatched.length - 1) {
-          userWatched.pop()
-        } else if (i === 0) {
-          userWatched.shift()
+        if (j > -1) {
+          userData[0].watched = userWatched.splice(j,1)
+          // await userData.save()
         } else {
-          userWatched = userWatched.slice(0, j).concat(userWatched.slice(j + 1))
+          res.send("User title not found")
         }
-        userData[0].watched = userWatched
+      })
+      .catch((err) => res.status(422).json(err));
+  },
+
+  // updateRating: function (req, res) {
+  //   db.User.find({ _id: req.body.id })
+  //     .populate("partyId")
+  //     // may need to .find() for party in order to update
+  //     // grab movie/show from watchedTitles and update rating
+  //     .then(async (userData) => {
+  //       const titleId = req.body.titleId
+  //       db.Party.find({ _id: userData[0].partyId._id })
+  //         .then(async (partyData) => {
+
+  //           // await partyData.save()
+  //         })
+  //       // await userData.save()
+  //       res.json(userData)
+  //     })
+  //     .catch((err) => res.status(422).json(err));
+  // },
+
+  // list of party likes that have already been viewed by user
+  viewedPartyTitle: function (req, res) {
+    db.User.find({ _id: req.body.id })
+      // add title to viewedPartyLikes
+      .then(async (userData) => {
+        const titleId = req.body.titleId
+        userData[0].viewedPartyLikes.push(titleId)
         // await userData.save()
         res.json(userData)
       })
       .catch((err) => res.status(422).json(err));
   },
 
-  updateRating: function (req, res) {
-    db.User.find({ _id: req.body.id })
-      .populate("partyId")
-      // may need to .find() for party in order to update
-      // grab move/show from watchedTitles and update rating
-      .save()
-      .then((data) => res.json(data))
-      .catch((err) => res.status(422).json(err));
-  },
-
-  viewedPartyTitle: function (req, res) {
-    db.User.find({ _id: req.body.id })
-      // add title to viewedPartyLikes
-      .save()
-      .then((data) => res.json(data))
-      .catch((err) => res.status(422).json(err));
-  },
-
   addToQueue: function (req, res) {
     // switch statement to determine if movie or show
+    const queueType = queueMovieShowSwitch(req.body.titleType)
     db.User.find({ _id: req.body.id })
-      // add to movie/show queue
-      .save()
-      .then((data) => res.json(data))
+      .select([queueType])
+      .then(async (userData) => {
+        let queue = userData[0][queueType]
+        const titleId = req.body.titleId
+        queue[titleId] = {
+          "title": req.body.titleName,
+          "imdb": req.body.imdbRating,
+          "next": null
+        }
+        if (queue.head === null) {
+          queue.head = titleId
+        } else {
+          let tailId = queue.tail
+          queue[tailId].next = titleId
+        }
+        queue.tail = titleId
+        // await userData.save()
+        res.json(userData)
+      })
       .catch((err) => res.status(422).json(err));
   },
 
   removeFromQueue: function (req, res) {
     // switch statement to determine if movie or show
+    const queueType = queueMovieShowSwitch(req.body.titleType)
     db.User.find({ _id: req.body.id })
+      .select([queueType])
       // remove from movie/show queue
-      .save()
-      .then((data) => res.json(data))
+      .then((data) => {
+        let queue = data[0][queueType]
+        const titleId = req.body.titleId
+        let headId = queue.head
+        if (titleId === queue.head) {
+          queue.head = queue[headId].next
+        } else if (queue[headId].next === titleId && queue[headId].next === queue.tail) {
+          queue.tail = queue.head
+          queue[headId].next = null
+        } else {
+          let current = queue[headId]
+          let prev = null;
+          while (current.next !== titleId) {
+            prev = current
+            current = queue[current.next]
+          }
+          current.next = queue[current.next].next
+          if (!current.next) {
+            queue.tail = prev.next
+          }
+        }
+        queue[titleId] = undefined;
+        // await data.save()
+        res.json(data)
+      })
       .catch((err) => res.status(422).json(err));
   },
 
