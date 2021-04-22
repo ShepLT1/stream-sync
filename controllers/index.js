@@ -74,6 +74,8 @@ module.exports = {
   //     .catch((err) => res.status(422).json(err));
   // },
 
+  // TODO likely get rid of like & unlike title functions, just use queues instead
+
   likeTitle: function (req, res) {
     const likedList = likedMovieShowSwitch(req.body.titleType);
     db.User.find({ _id: req.body.id })
@@ -212,6 +214,8 @@ module.exports = {
   //     .catch((err) => res.status(422).json(err));
   // },
 
+  // TODO Add db call for adding titles to viewed party titles
+
   // list of party likes that have already been viewed by user
   viewedPartyTitle: function (req, res) {
     db.User.find({ _id: req.body.id })
@@ -224,6 +228,8 @@ module.exports = {
       })
       .catch((err) => res.status(422).json(err));
   },
+
+  // TODO change to addToList
 
   addToQueue: function (req, res) {
     // switch statement to determine if movie or show
@@ -250,6 +256,8 @@ module.exports = {
       })
       .catch((err) => res.status(422).json(err));
   },
+
+  // TODO change to remove from list
 
   removeFromQueue: function (req, res) {
     // switch statement to determine if movie or show
